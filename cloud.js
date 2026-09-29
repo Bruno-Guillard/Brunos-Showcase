@@ -41,7 +41,7 @@
   window.ShowcaseCloud = {
     async fetchShowcase() {
       const [items, photos] = await Promise.all([
-        rpc('folio_showcase_items'),
+        rpc('folio_showcase_items_v2'),
         rpc('folio_showcase_photos')
       ]);
       return { items, photos };

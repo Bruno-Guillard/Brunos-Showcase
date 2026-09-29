@@ -21,9 +21,11 @@
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;');
 
+  const formatPrice = value => `${Number(value).toLocaleString('fr-FR', { maximumFractionDigits: 2 })} €`;
+
   function signature(data) {
     return JSON.stringify({
-      i: data.items.map(x => [x.id, x.updated_at, x.sort_order, x.name, x.description]),
+      i: data.items.map(x => [x.id, x.updated_at, x.sort_order, x.listing_title, x.asking_price, x.description]),
       p: data.photos.map(x => [x.item_id, x.storage_path, x.sort_order])
     });
   }
@@ -72,7 +74,8 @@
     card.dataset.id = item.id;
     card.innerHTML = `
       <div class="thumbWrap"><div class="thumb placeholder"><span>⌚</span></div></div>
-      <div class="cardName">${escapeHtml(item.name || 'Montre')}</div>
+      <div class="cardName">${escapeHtml(item.listing_title || 'Montre')}</div>
+      ${item.asking_price !== null && item.asking_price !== undefined ? `<div class="cardPrice">${formatPrice(item.asking_price)}</div>` : ''}
     `;
     card.addEventListener('click', () => openDetail(item.id));
     return card;
@@ -92,7 +95,7 @@
         const url = await photoUrl(first.storage_path);
         if (!card.isConnected) continue;
         const wrap = card.querySelector('.thumbWrap');
-        wrap.innerHTML = `<img class="thumb" src="${url}" alt="${escapeHtml(item.name || 'Montre')}" loading="lazy">`;
+        wrap.innerHTML = `<img class="thumb" src="${url}" alt="${escapeHtml(item.listing_title || 'Montre')}" loading="lazy">`;
       } catch (_) {}
     }
   }
@@ -102,10 +105,12 @@
     if (!item) return;
     const photos = state.photosByItem.get(itemId) || [];
 
+    detailContent.dataset.itemId = item.id;
     detailContent.innerHTML = `
       <div class="detailHead">
         <div class="detailEyebrow">Bruno’s Showcase</div>
-        <h2>${escapeHtml(item.name || 'Montre')}</h2>
+        <h2>${escapeHtml(item.listing_title || 'Montre')}</h2>
+        ${item.asking_price !== null && item.asking_price !== undefined ? `<div class="detailPrice"><span>Prix</span><strong>${formatPrice(item.asking_price)}</strong></div>` : ''}
       </div>
       <div class="detailGallery" id="detailGallery">
         ${photos.length ? photos.map(() => '<div class="detailPhoto loading"></div>').join('') : '<div class="noPhoto">Aucune photo</div>'}
@@ -121,7 +126,7 @@
         const url = await photoUrl(p.storage_path);
         if (!slots[i]?.isConnected) return;
         slots[i].classList.remove('loading');
-        slots[i].innerHTML = `<img src="${url}" alt="${escapeHtml(item.name || 'Montre')} — photo ${i + 1}" loading="lazy">`;
+        slots[i].innerHTML = `<img src="${url}" alt="${escapeHtml(item.listing_title || 'Montre')} — photo ${i + 1}" loading="lazy">`;
       } catch (_) {
         if (slots[i]) slots[i].textContent = 'Photo indisponible';
       }
@@ -149,9 +154,7 @@
           state = { items: data.items || [], photosByItem: groupPhotos(data.photos || []) };
           cleanupPhotoUrls(data.photos || []);
           await renderGrid();
-          const openId = detailContent.querySelector('.detailHead') && dialog.open
-            ? state.items.find(x => detailContent.querySelector('h2')?.textContent === (x.name || 'Montre'))?.id
-            : null;
+          const openId = dialog.open ? detailContent.dataset.itemId : null;
           if (dialog.open && !openId) closeDialog();
         } else if (!silent) {
           statusEl.hidden = true;

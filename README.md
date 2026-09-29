@@ -20,3 +20,16 @@ Aucun prix d’achat, prix de vente, bénéfice, frais, trésorerie ou autre don
 La vitrine interroge Supabase au lancement, au retour sur la page et toutes les 20 secondes. Une montre déplacée hors de `En vente` / `À vendre` disparaît donc automatiquement de la vitrine.
 
 La page contient aussi `noindex,nofollow` afin de demander aux moteurs de recherche de ne pas l’indexer. Cela ne constitue pas un contrôle d’accès : toute personne possédant l’URL peut ouvrir la vitrine.
+
+## V1.1 — Titre d’annonce + Prix
+
+Cette version n'affiche plus le nom interne Folio. Elle utilise uniquement :
+- `listing_title` comme titre public ;
+- `asking_price`, affiché sous le libellé **Prix** ;
+- `description` ;
+- les photos autorisées de la montre.
+
+Avant de publier cette version :
+1. exécuter `SUPABASE-V6.5-ANNONCES.sql` fourni avec Folio V6.5 ;
+2. exécuter `SUPABASE-BRUNOS-SHOWCASE-V1.1.sql` dans Supabase > SQL Editor ;
+3. remplacer ensuite les fichiers du dépôt GitHub `Brunos-Showcase`.
