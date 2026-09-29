@@ -33,3 +33,7 @@ Avant de publier cette version :
 1. exécuter `SUPABASE-V6.5-ANNONCES.sql` fourni avec Folio V6.5 ;
 2. exécuter `SUPABASE-BRUNOS-SHOWCASE-V1.1.sql` dans Supabase > SQL Editor ;
 3. remplacer ensuite les fichiers du dépôt GitHub `Brunos-Showcase`.
+
+
+## V1.2 — Icône d’application
+Le visuel de la boîte à montres est utilisé comme icône PWA (Android, iOS et favicon).
