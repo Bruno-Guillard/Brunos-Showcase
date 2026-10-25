@@ -25,7 +25,7 @@
 
   function signature(data) {
     return JSON.stringify({
-      i: data.items.map(x => [x.id, x.updated_at, x.sort_order, x.listing_title, x.asking_price, x.description]),
+      i: data.items.map(x => [x.id, x.updated_at, x.sort_order, x.listing_title, x.asking_price, x.description, x.sale_status]),
       p: data.photos.map(x => [x.item_id, x.storage_path, x.sort_order])
     });
   }
@@ -75,7 +75,14 @@
     card.innerHTML = `
       <div class="thumbWrap"><div class="thumb placeholder"><span>⌚</span></div></div>
       <div class="cardName">${escapeHtml(item.listing_title || 'Montre')}</div>
-      ${item.asking_price !== null && item.asking_price !== undefined ? `<div class="cardPrice">${formatPrice(item.asking_price)}</div>` : ''}
+      ${item.asking_price !== null && item.asking_price !== undefined ? `
+        <div class="cardPriceRow">
+          <div class="cardPrice">${formatPrice(item.asking_price)}</div>
+          <span class="statusBadge ${item.sale_status === 'sold' ? 'sold' : 'available'}">${item.sale_status === 'sold' ? 'VENDU' : 'DISPO'}</span>
+        </div>` : `
+        <div class="cardPriceRow">
+          <span class="statusBadge ${item.sale_status === 'sold' ? 'sold' : 'available'}">${item.sale_status === 'sold' ? 'VENDU' : 'DISPO'}</span>
+        </div>`}
     `;
     card.addEventListener('click', () => openDetail(item.id));
     return card;
@@ -110,7 +117,13 @@
       <div class="detailHead">
         <div class="detailEyebrow">Bruno’s Showcase</div>
         <h2>${escapeHtml(item.listing_title || 'Montre')}</h2>
-        ${item.asking_price !== null && item.asking_price !== undefined ? `<div class="detailPrice"><span>Prix</span><strong>${formatPrice(item.asking_price)}</strong></div>` : ''}
+        ${item.asking_price !== null && item.asking_price !== undefined ? `
+          <div class="detailPrice">
+            <span>Prix</span>
+            <strong>${formatPrice(item.asking_price)}</strong>
+            <span class="statusBadge ${item.sale_status === 'sold' ? 'sold' : 'available'}">${item.sale_status === 'sold' ? 'VENDU' : 'DISPO'}</span>
+          </div>` : `
+          <div class="detailPrice"><span class="statusBadge ${item.sale_status === 'sold' ? 'sold' : 'available'}">${item.sale_status === 'sold' ? 'VENDU' : 'DISPO'}</span></div>`}
       </div>
       <div class="detailGallery" id="detailGallery">
         ${photos.length ? photos.map(() => '<div class="detailPhoto loading"></div>').join('') : '<div class="noPhoto">Aucune photo</div>'}
