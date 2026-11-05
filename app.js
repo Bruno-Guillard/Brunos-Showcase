@@ -36,6 +36,21 @@
     syncDot.title = mode === 'busy' ? 'Mise à jour…' : mode === 'error' ? 'Mise à jour impossible' : 'À jour';
   }
 
+  function visibleShowcaseItems(items = []) {
+    const available = items.filter(item => item.sale_status !== 'sold');
+    const sold = items
+      .filter(item => item.sale_status === 'sold')
+      .sort((a, b) => {
+        const ad = Date.parse(a.sold_at || a.updated_at || 0) || 0;
+        const bd = Date.parse(b.sold_at || b.updated_at || 0) || 0;
+        if (ad !== bd) return bd - ad;
+        return Number(a.sort_order || 0) - Number(b.sort_order || 0);
+      })
+      .slice(0, 10);
+
+    return [...available, ...sold];
+  }
+
   function groupPhotos(rows) {
     const map = new Map();
     for (const row of rows) {
@@ -164,7 +179,7 @@
         const nextSig = signature(data);
         if (nextSig !== currentSignature) {
           currentSignature = nextSig;
-          state = { items: data.items || [], photosByItem: groupPhotos(data.photos || []) };
+          state = { items: visibleShowcaseItems(data.items || []), photosByItem: groupPhotos(data.photos || []) };
           cleanupPhotoUrls(data.photos || []);
           await renderGrid();
           const openId = dialog.open ? detailContent.dataset.itemId : null;
